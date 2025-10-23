@@ -1,0 +1,60 @@
+[General]
+screen_capture_size = 100, 100
+saturation_factor = 3
+
+[TuyaSettings]
+update_frequency=50
+
+[MQTTSettings]
+update_frequency=0.5
+
+[MagicHomeSettings]
+update_frequency = 50
+
+[KasaSettings]
+update_frequency = 50
+
+[MQTT]
+broker=192.168.x.x
+port=1883
+username=x
+password=x
+
+[BulbTuya1]
+device_id = xxx
+local_key = xxx
+ip_address = 192.168.xx.xx
+
+[BulbTuya2]
+device_id = xxx
+local_key = xxx
+ip_address = 192.168.xx.xx
+
+[BulbTuya3]
+device_id = xxx
+local_key = xxx
+ip_address = 192.168.xx.xx
+
+[BulbMQTT1]
+topic=zigbee2mqtt/friendly name/set
+
+[BulbMQTT2]
+topic=zigbee2mqtt/friendly name/set
+
+#[BulbMagicHome1]
+#ip_address = 192.168.xxx.xxx
+#placement = center-left
+
+[BulbKasa1]
+device_alias = Living Room Bulb
+placement = center-left
+
+[BulbKasa2]
+device_alias = Bedroom Light
+placement = center-right
+
+# ... Add more bulbs as needed
+
+
+
+
