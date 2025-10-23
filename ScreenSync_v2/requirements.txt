@@ -6,4 +6,4 @@ matplotlib
 mss
 platformdirs
 flux_led
-python-kasa>=0.10.2
+python-kasa
