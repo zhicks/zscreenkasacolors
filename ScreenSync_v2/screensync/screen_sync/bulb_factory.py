@@ -52,15 +52,17 @@ class BulbFactory:
                 pass
             elif bulb_type == 'Kasa':
                 try:
+                    print(f"[BulbFactory] Initializing Kasa bulb: {bulb_config['device_alias']} (placement: {placement})")
                     bulb = KasaBulbControl(
                         device_alias=bulb_config['device_alias'],
                         rate_limiter=rate_limiter,
                         placement=placement
                     )
                     bulbs.append(bulb)
+                    print(f"[BulbFactory] Kasa bulb '{bulb_config['device_alias']}' added to bulb list")
                 except Exception as error:
-                    print("An exception occurred:", error)
-                    print("Error adding " + bulb_config.get('type') + " bulb with alias " + bulb_config.get('device_alias', 'unknown'))
+                    print(f"[BulbFactory] An exception occurred: {error}")
+                    print(f"[BulbFactory] Error adding {bulb_config.get('type')} bulb with alias {bulb_config.get('device_alias', 'unknown')}")
             # Add more conditions for other bulb types
 
             if bulb:

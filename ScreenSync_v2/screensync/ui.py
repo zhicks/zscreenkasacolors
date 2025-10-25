@@ -31,12 +31,17 @@ def main():
 
     # Check if config directory exists and if not create
     os.makedirs(user_data_dir(appname, appauthor), exist_ok=True)
-    #print(user_data_dir(appname, appauthor) + '/config.ini')
+    config_path = user_data_dir(appname, appauthor) + '/config.ini'
+    print(f"[ScreenSync] Using config file: {config_path}")
+    
     # Initialize necessary objects
-    config_manager = ConfigManager(user_data_dir(appname, appauthor) + '/config.ini')
+    config_manager = ConfigManager(config_path)
 
+    print("[ScreenSync] Creating bulbs from configuration...")
     bulb_factory = BulbFactory(config_manager)
     bulbs = bulb_factory.create_bulbs()
+    print(f"[ScreenSync] Created {len(bulbs)} bulb(s) successfully")
+    
     coordinator = Coordinator(bulbs, color_processing)
     icon_path = pkg_resources.resource_filename('screensync', 'assets/ScreenSync.ico')
     banner_path = pkg_resources.resource_filename('screensync', 'assets/screensync-banner.png')

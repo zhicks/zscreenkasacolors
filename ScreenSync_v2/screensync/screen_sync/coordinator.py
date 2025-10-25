@@ -42,12 +42,17 @@ class Coordinator:
         self.threads.append(t)
 
     def start(self):
+        print(f"[Coordinator] Starting screen sync with {len(self.bulbs)} bulb(s)")
+        for bulb in self.bulbs:
+            bulb_info = f"{bulb.type} - {getattr(bulb, 'device_alias', getattr(bulb, 'device_id', 'unknown'))}"
+            print(f"[Coordinator] - {bulb_info} (placement: {bulb.placement})")
         self.running = True
         self.update_thread = threading.Thread(target=self.run_update_loop)
         self.update_thread.start()
         self.threads = [threading.Thread(target=self.update_bulb_color, args=(bulb,)) for bulb in self.bulbs]
         for thread in self.threads:
             thread.start()
+        print("[Coordinator] Screen sync started successfully")
 
 
     def run_update_loop(self):
@@ -76,6 +81,7 @@ class Coordinator:
 
 
     def stop(self):
+        print("[Coordinator] Stopping screen sync...")
         self.running = False
         if self.update_thread:
             self.update_thread.join()
@@ -89,7 +95,8 @@ class Coordinator:
             try:
                 bulb.set_color(*warm_yellow_dimmed)
             except Exception as e:
-                print(f"Error setting final color for bulb: {e}")
+                print(f"[Coordinator] Error setting final color for bulb: {e}")
+        print("[Coordinator] Screen sync stopped")
 
 # Usage in your main script
 # coordinator = Coordinator(bulbs, color_processing)
