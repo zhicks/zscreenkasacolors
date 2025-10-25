@@ -11,10 +11,21 @@ class Coordinator:
         self.running = False
         self.color_cache = defaultdict(lambda: (0, 0, 0))  # Default color is black
         self.lock = threading.Lock()
+        self.brightness = 100  # Brightness percentage (1-100)
 
     def set_mode(self, mode):
         self.mode = mode
         # Any other updates required when changing modes
+
+    def set_brightness(self, brightness):
+        """Set the brightness percentage (1-100)"""
+        self.brightness = max(1, min(100, brightness))  # Clamp between 1 and 100
+
+    def apply_brightness(self, color):
+        """Apply brightness multiplier to RGB color"""
+        r, g, b = color
+        multiplier = self.brightness / 100.0
+        return (int(r * multiplier), int(g * multiplier), int(b * multiplier))
 
     def update_bulbs(self, new_bulbs):
         if self.running:
@@ -47,6 +58,8 @@ class Coordinator:
             if self.mode == 'shooter':
                 # In shooter mode, capture the screen once for the center
                 center_color = self.color_processing.process_screen_zone('center', mode='Shooter')
+                # Apply brightness
+                center_color = self.apply_brightness(center_color)
                 for bulb in self.bulbs:
                     # Update all bulbs with the center color
                     self.update_bulb_color(bulb, center_color)
@@ -54,6 +67,8 @@ class Coordinator:
                 # In normal mode, update each bulb based on its zone
                 for bulb in self.bulbs:
                     zone_color = self.color_processing.process_screen_zone(bulb.placement)
+                    # Apply brightness
+                    zone_color = self.apply_brightness(zone_color)
                     self.update_bulb_color(bulb, zone_color)
 
             # Sleep to avoid overloading
@@ -66,6 +81,15 @@ class Coordinator:
             self.update_thread.join()
         for t in self.threads:
             t.join()
+        
+        # Send a warm yellow color at 50% brightness to all bulbs
+        warm_yellow = (255, 220, 150)  # Warm yellow RGB
+        warm_yellow_dimmed = (int(255 * 0.5), int(220 * 0.5), int(150 * 0.5))
+        for bulb in self.bulbs:
+            try:
+                bulb.set_color(*warm_yellow_dimmed)
+            except Exception as e:
+                print(f"Error setting final color for bulb: {e}")
 
 # Usage in your main script
 # coordinator = Coordinator(bulbs, color_processing)

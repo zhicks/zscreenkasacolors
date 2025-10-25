@@ -43,7 +43,7 @@ def main():
     # Define the main window
     root = tk.Tk()
     root.title("ScreenSync V2")
-    root.geometry('245x265')  # Width x Height
+    root.geometry('400x380')  # Width x Height - increased for better visibility on 4K screens
     root.configure(bg='#000000')
     root.resizable(False, False)
     root.overrideredirect(False)
@@ -51,42 +51,61 @@ def main():
 
     # Load and resize the banner image
     banner_image = Image.open(banner_path)
-    banner_image = banner_image.resize((200, 55),  PIL.Image.Resampling.LANCZOS)
+    banner_image = banner_image.resize((320, 88),  PIL.Image.Resampling.LANCZOS)
 
     banner_photo = ImageTk.PhotoImage(banner_image)
     # Create a Label to display the image
     banner_label = tk.Label(root, image=banner_photo, bg='#000000')
     banner_label.image = banner_photo  # Keep a reference to avoid garbage collection
-    banner_label.place(x=20, y=5)  # Place at the top of the window
+    banner_label.place(x=40, y=5)  # Place at the top of the window
 
 
     # Stats graph frame
-    stats_frame = tk.Frame(root, bg='#000000', width=227, height=83)
-    stats_frame.place(x=9, y=60)
+    stats_frame = tk.Frame(root, bg='#000000', width=370, height=120)
+    stats_frame.place(x=15, y=100)
 
     update_graph = create_embedded_graph(runtime_stats, stats_frame)
     refresh_graph(root, update_graph)  # Start the periodic update
 
 
     # Settings Button
-    settings_button = tk.Button(root, bg='#D9D9D9', text='Settings',
+    settings_button = tk.Button(root, bg='#D9D9D9', text='Settings', width=12,
                                 command=lambda: open_settings_window(root, coordinator, config_manager, bulb_factory))
-    settings_button.place(x=11, y=160)
+    settings_button.place(x=20, y=235)
 
 
     # Add New Button
-    shooter_button = tk.Button(root,bg='#D9D9D9',text='Enable Shooter'
-                                               ,command=lambda: shooter_clicked(shooter_button, coordinator))
-    shooter_button.place(x=133, y=160)
+    shooter_button = tk.Button(root,bg='#D9D9D9',text='Enable Shooter', width=15,
+                                               command=lambda: shooter_clicked(shooter_button, coordinator))
+    shooter_button.place(x=240, y=235)
 
     # Bind the on_closing function to the window's close event
     root.protocol("WM_DELETE_WINDOW", lambda: on_closing(root, coordinator))
 
+    # Brightness slider
+    brightness_frame = tk.Frame(root, bg='#000000')
+    brightness_frame.place(x=20, y=270)
+    
+    brightness_label = tk.Label(brightness_frame, text="Brightness:", bg='#000000', fg='white', font=("TkDefaultFont", 10))
+    brightness_label.pack(side='left', padx=(0, 10))
+    
+    brightness_var = tk.IntVar(value=100)
+    
+    brightness_value_label = tk.Label(brightness_frame, text="100%", bg='#000000', fg='white', 
+                                      font=("TkDefaultFont", 10), width=5)
+    
+    brightness_slider = tk.Scale(brightness_frame, from_=1, to=100, orient='horizontal', 
+                                 variable=brightness_var, bg='#404957', fg='white', 
+                                 highlightthickness=0, length=200, width=15,
+                                 command=lambda v: on_brightness_changed(coordinator, brightness_var, brightness_value_label))
+    brightness_slider.pack(side='left')
+    
+    brightness_value_label.pack(side='left', padx=(10, 0))
+
     # Start/Stop Button
-    # Start/Stop Button
-    start_stop_button = tk.Button(root, text="Start", bg='#D9D9D9', width=31, height=3,
+    start_stop_button = tk.Button(root, text="Start", bg='#D9D9D9', width=48, height=3,
                                   command=lambda: start_stop_button_clicked(start_stop_button, coordinator))
-    start_stop_button.place(x=9, y=200)
+    start_stop_button.place(x=20, y=315)
 
 
 
@@ -143,6 +162,11 @@ def start_stop_button_clicked(start_stop_button, coordinator):
     else:
         coordinator.start()
         start_stop_button.config(text="Stop")
+
+def on_brightness_changed(coordinator, brightness_var, brightness_value_label):
+    brightness = brightness_var.get()
+    coordinator.set_brightness(brightness)
+    brightness_value_label.config(text=f"{brightness}%")
 
 
 
