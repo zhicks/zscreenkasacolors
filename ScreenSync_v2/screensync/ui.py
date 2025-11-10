@@ -139,9 +139,19 @@ def toggle_shooter_mode(shooter_button, coordinator):
 
 # Define a function to be called when the window is closed
 def on_closing(root, coordinator):
-    if coordinator.running:
-        coordinator.stop()  # Make sure to stop the coordinator
-    root.destroy()  # Destroy the main window
+    try:
+        print("[UI] Closing application...")
+        if coordinator.running:
+            coordinator.stop()  # Make sure to stop the coordinator
+        print("[UI] Coordinator stopped, destroying window...")
+        root.destroy()  # Destroy the main window
+    except Exception as e:
+        print(f"[UI] Error during closing: {e}")
+        # Force destroy the window even if there's an error
+        try:
+            root.destroy()
+        except:
+            pass
 
 
 
@@ -161,12 +171,27 @@ def shooter_clicked(shooter_button, coordinator):
     print("Toggle shooter mode clicked")
 
 def start_stop_button_clicked(start_stop_button, coordinator):
-    if coordinator.running:
-        coordinator.stop()
-        start_stop_button.config(text="Start")
-    else:
-        coordinator.start()
-        start_stop_button.config(text="Stop")
+    try:
+        if coordinator.running:
+            print("[UI] Stop button clicked")
+            coordinator.stop()
+            start_stop_button.config(text="Start")
+            print("[UI] UI updated to Start state")
+        else:
+            print("[UI] Start button clicked")
+            coordinator.start()
+            start_stop_button.config(text="Stop")
+            print("[UI] UI updated to Stop state")
+    except Exception as e:
+        print(f"[UI] Error in start/stop button handler: {e}")
+        # Try to ensure button is in correct state
+        try:
+            if coordinator.running:
+                start_stop_button.config(text="Stop")
+            else:
+                start_stop_button.config(text="Start")
+        except:
+            pass
 
 def on_brightness_changed(coordinator, brightness_var, brightness_value_label):
     brightness = brightness_var.get()
